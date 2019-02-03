@@ -2,6 +2,7 @@
 #include <stdio.h> //printf, scanf
 #include <wait.h> //waitpid
 #include <string.h> //strncmp
+#include <stdarg.h> //arg parse
 #include <errno.h> //perror, errno
 
 int main(int argc, char* argv[])
