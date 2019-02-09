@@ -20,9 +20,9 @@ int main(int argc, char* argv){
 	{
     	    {"all", required_argument, NULL, 'a'},
     	    {"directory", required_argument, NULL, 'd'},
-	    {"group-directories-first", required_arugment, NULL, 1}
-	    {"reverse", required_argument, NULL, r}
-	    {"recursive", required_argument, NULL, R}
+	    {"group-directories-first", required_arugment, NULL, 'g'}
+	    {"reverse", required_argument, NULL, 'r'}
+	    {"recursive", required_argument, NULL, 'R'}
     	    {NULL, 0, NULL, 0}
 	};
 	
@@ -50,8 +50,16 @@ int main(int argc, char* argv){
 		    case 't':
 		    break;
 				
-			
-
+		    case 'g':
+		    break;
+		
+		    case '?':
+		    break;
+				
+		    default:
+				
+				
+						
 	
 	ls();
 	return 0;
