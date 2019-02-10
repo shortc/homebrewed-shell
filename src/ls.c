@@ -45,6 +45,17 @@ char const * s_perm(mode_t mode) {
 	return local_buff;
 }
 
+void reverse_array(struct dirent **arr, int start, int end){
+	struct dirent *temp; 
+   	if (start >= end){
+		return;
+	}	
+	temp = arr[start];    
+	arr[start] = arr[end]; 
+	arr[end] = temp; 
+	reverse_array(arr, start+1, end-1);
+}
+
 int ls(){
 	char* dirname = getenv("PWD");
 	DIR *current_dir = opendir(dirname);
@@ -80,6 +91,10 @@ int ls(){
 		current_file = readdir(current_dir);
 		entries[counter] = current_file;
 		counter++;
+	}
+
+	if(1==1){
+		reverse_array(entries, 0, file_counter - 1);
 	}
 
 	for(int i = 0; i < file_counter; i++){
