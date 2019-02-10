@@ -18,11 +18,11 @@ int main(int argc, char* argv){
 	
 	static struct option full_arg[] =   //building a struct to house all of the written out command args 
 	{
-    	    {"all", required_argument, NULL, 'a'},
-    	    {"directory", required_argument, NULL, 'd'},
-	    {"group-directories-first", required_arugment, NULL, 'g'}
-	    {"reverse", required_argument, NULL, 'r'}
-	    {"recursive", required_argument, NULL, 'R'}
+    	    {"all", no_argument, NULL, 'a'},
+    	    {"directory", no_argument, NULL, 'd'},
+	    {"group-directories-first", no_arugment, NULL, 'g'}
+	    {"reverse", no_argument, NULL, 'r'}
+	    {"recursive", no_argument, NULL, 'R'}
     	    {NULL, 0, NULL, 0}
 	};
 	
