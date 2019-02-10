@@ -2,6 +2,48 @@
 #include<stdlib.h>
 #include<dirent.h>
 #include<unistd.h>
+#include<sys/stat.h>
+#include<sys/types.h>
+#include<unistd.h>
+
+char const * s_perm(mode_t mode) {
+    static char local_buff[16] = {0};
+	int i = 0;
+	//special file designations
+	if(S_ISREG(mode)) local_buff[i] = '-';
+	else if(S_ISDIR(mode)) local_buff[i] = 'd';
+	i++;
+	//user permissions
+	if ((mode & S_IRUSR) == S_IRUSR) local_buff[i] = 'r';
+	else local_buff[i] = '-';
+	i++;
+	if ((mode & S_IWUSR) == S_IWUSR) local_buff[i] = 'w';
+	else local_buff[i] = '-';
+	i++;
+	if ((mode & S_IXUSR) == S_IXUSR) local_buff[i] = 'x';
+	else local_buff[i] = '-';
+	i++;
+ 	//group permissions
+	if ((mode & S_IRGRP) == S_IRGRP) local_buff[i] = 'r';
+	else local_buff[i] = '-';
+	i++;
+	if ((mode & S_IWGRP) == S_IWGRP) local_buff[i] = 'w';
+	else local_buff[i] = '-';
+	i++;
+	if ((mode & S_IXGRP) == S_IXGRP) local_buff[i] = 'x';
+	else local_buff[i] = '-';
+	i++;
+	// other permissions
+	if ((mode & S_IROTH) == S_IROTH) local_buff[i] = 'r';
+	else local_buff[i] = '-';
+	i++;
+	if ((mode & S_IWOTH) == S_IWOTH) local_buff[i] = 'w';
+	else local_buff[i] = '-';
+	i++;
+	if ((mode & S_IXOTH) == S_IXOTH) local_buff[i] = 'x';
+	else local_buff[i] = '-';
+	return local_buff;
+}
 
 int ls(){
 	char* dirname = getenv("PWD");
@@ -40,7 +82,16 @@ int ls(){
 		counter++;
 	}
 
-	printf("%s\n", entries[2]->d_name);
+	for(int i = 0; i < file_counter; i++){
+    	struct stat statbuf;
+		if (stat(entries[i]->d_name, &statbuf) == -1){
+			printf("error\n");
+			continue; 
+		}
+		printf("%-10.10s ", s_perm (statbuf.st_mode));
+		printf("%-10d", statbuf.st_size);
+		printf("%-10s\n", entries[i]->d_name);
+	}
 	closedir(current_dir);
 }
 
