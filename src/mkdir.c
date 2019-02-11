@@ -2,15 +2,52 @@
 #include<stdlib.h>
 #include<unistd.h>
 #include<getopt.h>
+#include<sys/stat.h>
+#include<sys/types.h>
 
-getenv("PWD");
-
-static int verbose_flag;
-static int parent_flag;
+static int verbose_flag = 0;
+static int parent_flag = 0;
 
 mkdir() //here's the start
 {
-  
+  char* dirname = getenv("PWD");
+	DIR *current_dir = opendir(dirname);
+	struct dirent *dir_to_list  = readdir(current_dir);
+		
+		
+	while (1) {
+        static struct option full_arg[] =   //building a struct to house all of the written out command args
+    	{
+        {"parent", 0, 0, 'p'}
+    	{"verbose", 0, 0, 'v'},
+    	{NULL, 0, NULL, 0}
+    	};
+
+        sarg = getopt_long(argc, argv, "p:v", full_arg, &parent_flag, &verbose_flag);
+
+        if (sarg == -1) 
+	{
+            break;
+        }
+
+
+        switch (sarg)
+        {
+            case 0:
+                break;
+
+            case 'p':
+                parent_flag = 1;
+                puts ("option -p\n");
+                break;
+
+            case 'v':
+                verbose_flag = 1;
+                puts ("option -v\n");
+                break;	
+			
+	
+	
   so...let's first check for what arguments we have.
     no args?
     
