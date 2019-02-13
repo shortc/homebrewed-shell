@@ -32,7 +32,7 @@ int main(int argc, char** argv)
 			{NULL, 0, NULL, 0}
 		};
 
-		sarg = getopt_long(argc, argv, "p:v", full_arg, &command_flag);
+		sarg = getopt_long(argc, argv, "p:v", full_arg, &command_index);
 
 		if (sarg == -1)                                    //if there are no/no more arguments 
 		{
@@ -42,9 +42,9 @@ int main(int argc, char** argv)
 		switch (sarg)
 		{
 			case 0
-              			if (full_arg[option_index].flag != 0)
+              			if (full_arg[command_index].flag != 0)
 					break;
-                		printf ("option %s", full_arg[option_index].name);
+                		printf ("option %s", full_arg[command_index].name);
                 		if (optarg)
 					printf (" with arg %s", optarg);
                 			printf ("\n");
