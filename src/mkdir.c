@@ -105,12 +105,12 @@ int main(int argc, char** argv)
 	
 	if (command_flag[0] == 1)
 	{
-		print("We used the parent argument")
+		print("We used the parent argument");
 	}
 	
 	if (command_flag[1] == 1)
 	{
-		print("We used the verbose argument")
+		print("We used the verbose argument");
 			
 	}
 	
