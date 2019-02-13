@@ -70,7 +70,7 @@ int main(int argc, char** argv)
 	int curr_optind;
 	if (optind < argc) 
 	{
-        	printf ("In theory, these will be our files: ");
+        	printf("In theory, these will be our files: ");
 
         	while (optind < argc)
 		{
@@ -99,18 +99,18 @@ int main(int argc, char** argv)
 	
 	if (command_flag[0] == 1)
 	{
-		print("We used the parent argument");
+		printf("We used the parent argument");
 		//for (i = 0; i < sizeof(file_list)/sizeof(file_list[0]); ++i) 
 			
 	}
 	
 	if (command_flag[1] == 1)
 	{
-		print("We used the verbose argument");
+		printf("We used the verbose argument");
 		for (i = 0; i < sizeof(file_list)/sizeof(file_list[0]); ++i) 
-			constant char *file = file_list[i];
-			int mkdir(file, 0777);
-			print("mkdir: created directory '%s'", file_list[i]);
+			const char *file = file_list[i];
+			int mkdir(file, S_IRWXU | S_IRWXG | S_IRWXO );
+			printf("mkdir: created directory '%s'", file_list[i]);
 	}
 	
 	return 0;
