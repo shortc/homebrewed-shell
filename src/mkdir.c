@@ -8,12 +8,14 @@
 #include <pwd.h>
 #include <grp.h>
 #include <time.h>
+#include<string.h>
 	
 
 int main(int argc, char** argv)
 {
 	
 	int command_flag[2];                                 //argument flag	
+	int command_index = 0;
         int no_of_files = 0;
         int sarg;
 
@@ -39,14 +41,20 @@ int main(int argc, char** argv)
 	
 		switch (sarg)
 		{
-			case 0:
-				break;                             
+			case 0
+              			if (full_arg[option_index].flag != 0)
+					break;
+                		printf ("option %s", full_arg[option_index].name);
+                		if (optarg)
+					printf (" with arg %s", optarg);
+                			printf ("\n");
+               				 break;                            
             		case 'p':                                  //-p --parent
             			command_flag[0] = 1;
                 		puts ("option -p\n");
                 		break;
             		case 'v':                                  //-v --verbose
-                		verbose_flag[1] = 1;
+                		command_flag[1] = 1;
                 		puts ("option -v\n");
                 		break;	
 		}
@@ -74,20 +82,6 @@ int main(int argc, char** argv)
 		}
         	putchar ('\n');
    	 }
-	
-	/*establish the char we are watching out for*/
-	const char s[2] = "/";
-   	char *filechar;
-   
-   	/* get the first token */
-   	filechar = strtok(file_arr, s);
-   
-   	/* walk through other tokens */
-   	while( filechar != NULL ) 
-	{
-      	printf( " %s\n",filechar );
-      	filechar = strtok(NULL, s);
-	}
 	
 /*NEW STUFF*/
     int i = 0;
