@@ -7,7 +7,8 @@
 #include<sys/types.h>
 #include <pwd.h>
 #include <grp.h>
-#include <time.h>
+#include<time.h>
+#include<string.h>
 
 //#include<stat.h>
 //#include<types.h>
@@ -60,6 +61,48 @@ void reverse_array(struct dirent **arr, int start, int end){
 	arr[start] = arr[end];
 	arr[end] = temp;
 	reverse_array(arr, start+1, end-1);
+}
+
+void insertionSortSize(struct dirent **entries, int n){
+   int i, j;
+   struct dirent *key;
+   for (i = 1; i < n; i++){
+       struct stat statbuf;
+       struct stat statbufminus;
+       stat(entries[i]->d_name, &statbuf);
+       stat(entries[i - 1]->d_name, &statbufminus);
+
+       key = entries[i];
+       j = i - 1;
+
+       while (j >= 0 && statbufminus.st_size > statbuf.st_size){
+           entries[j + 1] = entries[j];
+           j = j - 1;
+           stat(entries[j]->d_name, &statbufminus);
+       }
+       entries[j + 1] = key;
+   }
+}
+
+void insertionSortTime(struct dirent **entries, int n){
+   int i, j;
+   struct dirent *key;
+   for (i = 1; i < n; i++){
+       struct stat statbuf;
+       struct stat statbufminus;
+       stat(entries[i]->d_name, &statbuf);
+       stat(entries[i - 1]->d_name, &statbufminus);
+
+       key = entries[i];
+       j = i - 1;
+
+       while (j >= 0 && statbufminus.st_mtime > statbuf.st_mtime){
+           entries[j + 1] = entries[j];
+           j = j - 1;
+           stat(entries[j]->d_name, &statbufminus);
+       }
+       entries[j + 1] = key;
+   }
 }
 
 int main(int argc, char** argv){
@@ -158,13 +201,27 @@ int main(int argc, char** argv){
     printf("%d",arrForArgs[6]);
     printf("%d\n",arrForArgs[7]);
 
+    char inputDir[2];
+    int inputCount = 0;
 
     /* Print any remaining command line arguments (not options). */
     if (optind < argc) {
-        printf ("Path name: ");
-        while (optind < argc)
-            printf ("%s ", argv[optind++]);
+        //printf ("Path name: ");
+        while (optind < argc) {
+            strcat(inputDir, argv[optind++]);
+            inputCount++;
+            //printf ("%s ", argv[optind++]);
+            //dirname = getenv("PWD");
+            //strcat(dirname, inputDir);
+            //current_dir = opendir(inputDir);
+            //printf("%s", inputDir);
+        }
+        current_dir = opendir(inputDir);
+
         putchar ('\n');
+    } else {
+        dirname = getenv("PWD");
+        current_dir = opendir(dirname);
     }
 
     if (arrForArgs[1] == 1) { // -d
@@ -172,8 +229,7 @@ int main(int argc, char** argv){
         return 0;
     }
 
-    dirname = getenv("PWD");
-    current_dir = opendir(dirname);
+
 
     struct dirent *current_file;
     int counter = 0;
@@ -189,28 +245,17 @@ int main(int argc, char** argv){
 
     if (arrForArgs[0] == 1){ // -a
         while ((current_file = readdir(current_dir)) != NULL){
-            //printf("%s\n", current_file->d_name);
             entries[counter] = current_file;
             counter++;
         }
     } else {
         while ((current_file = readdir(current_dir)) != NULL){
             if(current_file->d_name[0] != '.'){
-                //printf("%s\n", current_file->d_name);
                 entries[counter] = current_file;
                 counter++;
             }
         }
     }
-
-    // rewinddir(current_dir);
-    // struct dirent *entries[file_counter];
-    // int counter = 0;
-    // while(counter < file_counter){
-    //     current_file = readdir(current_dir);
-    //     entries[counter] = current_file;
-    //     counter++;
-    // }
 
     if (arrForArgs[2] == 1) { // -l
         for(int i = 0; i < counter; i++){
@@ -221,25 +266,23 @@ int main(int argc, char** argv){
                 continue;
             }
             strftime(timebuf, 14, "%b %d %H:%M", localtime(&statbuf.st_mtime));
-            //printf("%-10.10s  %-1d %-6s %-1s %-1d %-10s %-1s\n", s_perm(statbuf.st_mode), statbuf.st_nlink, getpwuid(statbuf.st_uid)->pw_name, getgrgid(statbuf.st_gid)->gr_name, statbuf.st_size, timebuf, entries[i]->d_name);
-            //printf("%-10.10s  %-1d %-6s %-1s %d %-10s %-1s\n", s_perm(statbuf.st_mode), statbuf.st_nlink, getpwuid(statbuf.st_uid)->pw_name, getgrgid(statbuf.st_gid)->gr_name, statbuf.st_size, timebuf, entries[i]->d_name);
-            printf("%-10.10s ",  s_perm(statbuf.st_mode));
-            printf("%-1d ",      statbuf.st_nlink);
-            printf("%-6s ",      getpwuid(statbuf.st_uid)->pw_name);
-            printf("%-1s ",      getgrgid(statbuf.st_gid)->gr_name);
-            printf("%*d ", 10,      statbuf.st_size);
-            printf("%*s ", 12,    timebuf);
-            printf("%-1s\n",    entries[i]->d_name);
-            // printf("%-10.10s\n", s_perm (statbuf.st_mode));
-            //printf("%-10s\n", getgrgid(statbuf.st_gid)->gr_name);
-            // printf("%-10s\n", entries[i]->d_name);
+            printf("%-10.10s ", s_perm(statbuf.st_mode));
+            printf("%2d ", statbuf.st_nlink);
+            printf("%-6s ", getpwuid(statbuf.st_uid)->pw_name);
+            printf("%-1s ", getgrgid(statbuf.st_gid)->gr_name);
+            printf("%*lld ", 10, statbuf.st_size);
+            printf("%s ", timebuf);
+            printf("%-1s\n", entries[i]->d_name);
         }
     } else if (arrForArgs[3] == 1) { // -r
         reverse_array(entries, 0, counter - 1);
+
     } else if (arrForArgs[5] == 1) { // -S
-
+        insertionSortSize(entries, counter);
+        reverse_array(entries, 0, counter - 1);
     } else if (arrForArgs[6] == 1) { // -t
-
+        insertionSortTime(entries, counter);
+        reverse_array(entries, 0, counter - 1);
     } else if (arrForArgs[7] == 1) { // --group-directories-first
 
     } else if (arrForArgs[4] == 1) { // -R
@@ -247,7 +290,7 @@ int main(int argc, char** argv){
     }
 
     for (int x = 0; x < counter; x++) {
-        //printf("%s\n", entries[x]->d_name);
+        printf("%s\n", entries[x]->d_name);
     }
 	return 0;
 }
