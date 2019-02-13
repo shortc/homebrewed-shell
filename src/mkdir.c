@@ -9,7 +9,6 @@
 int main(int argc, char** argv)
 {
 	
-	
 	static int verbose_flag = 0;                                 //argument flags
 	static int parent_flag = 0;		
         int no_of_files = 0;
@@ -49,8 +48,57 @@ int main(int argc, char** argv)
                 		break;	
 		}
 	}
+	/*Tell me if we used either argument*/
 	printf("%d",parent_flag);
 	printf("%d",verbose_flag);
+	
+	   
+         /*This will be used to read out the file names*/
+	char file_arr[255];
+	int file_count = 0;
+	int curr_optind;
+	if (optind < argc) 
+	{
+        	printf ("In theory, these will be our files: ");
+
+        	while (optind < argc)
+		{
+			curr_optind = optind;
+            		printf ("%s ", argv[curr_optind]);
+			file_arr[file_count] = curr_optind;
+			optind++; 
+			file_count ++;
+		}
+        	putchar ('\n');
+   	 }
+	
+	/*establish the char we are watching out for*/
+	const char s[2] = "/";
+   	char *filechar;
+   
+   	/* get the first token */
+   	filechar = strtok(file_arr, s);
+   
+   	/* walk through other tokens */
+   	while( filechar != NULL ) 
+	{
+      	printf( " %s\n",filechar );
+      	filechar = strtok(NULL, s);
+	}
+	
+/*NEW STUFF*/
+    int i = 0;
+    char *s = strtok(file_arr, "/");
+    char *file_list[255];
+
+    while(s != NULL)
+    {
+        file_list[i++] = s;
+        s = strtok(NULL, "/");
+    }
+    for (i = 0; i < 5; ++i) 
+        printf("%s\n", file_list[i]);
+/*NEW STUFF*/
 	
 	if (parent_flag == 1)
 	{
@@ -60,6 +108,7 @@ int main(int argc, char** argv)
 	if (verbose_flag == 1)
 	{
 		print("We used the verbose argument")
+			
 	}
 	
 	return 0;
