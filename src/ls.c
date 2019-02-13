@@ -161,7 +161,7 @@ int main(int argc, char** argv){
 
     /* Print any remaining command line arguments (not options). */
     if (optind < argc) {
-        printf ("non-accepted option: ");
+        printf ("Path name: ");
         while (optind < argc)
             printf ("%s ", argv[optind++]);
         putchar ('\n');
@@ -224,10 +224,10 @@ int main(int argc, char** argv){
             //printf("%-10.10s  %-1d %-6s %-1s %-1d %-10s %-1s\n", s_perm(statbuf.st_mode), statbuf.st_nlink, getpwuid(statbuf.st_uid)->pw_name, getgrgid(statbuf.st_gid)->gr_name, statbuf.st_size, timebuf, entries[i]->d_name);
             //printf("%-10.10s  %-1d %-6s %-1s %d %-10s %-1s\n", s_perm(statbuf.st_mode), statbuf.st_nlink, getpwuid(statbuf.st_uid)->pw_name, getgrgid(statbuf.st_gid)->gr_name, statbuf.st_size, timebuf, entries[i]->d_name);
             printf("%-10.10s ",  s_perm(statbuf.st_mode));
-            printf("%-1d "      statbuf.st_nlink);
+            printf("%-1d ",      statbuf.st_nlink);
             printf("%-6s ",      getpwuid(statbuf.st_uid)->pw_name);
             printf("%-1s ",      getgrgid(statbuf.st_gid)->gr_name);
-            printf("%-1d ",      statbuf.st_size);
+            printf("%*d ", 10,      statbuf.st_size);
             printf("%*s ", 12,    timebuf);
             printf("%-1s\n",    entries[i]->d_name);
             // printf("%-10.10s\n", s_perm (statbuf.st_mode));
