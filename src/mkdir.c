@@ -93,19 +93,24 @@ int main(int argc, char** argv)
         file_list[i++] = s;
         s = strtok(NULL, "/");
     }
-    for (i = 0; i < 5; ++i) 
+    for (i = 0; i < sizeof(file_list)/sizeof(file_list[0]); ++i) 
         printf("%s\n", file_list[i]);
 /*NEW STUFF*/
 	
 	if (command_flag[0] == 1)
 	{
 		print("We used the parent argument");
+		//for (i = 0; i < sizeof(file_list)/sizeof(file_list[0]); ++i) 
+			
 	}
 	
 	if (command_flag[1] == 1)
 	{
 		print("We used the verbose argument");
-			
+		for (i = 0; i < sizeof(file_list)/sizeof(file_list[0]); ++i) 
+			constant char *file = file_list[i];
+			int mkdir(file, 0777);
+			print("mkdir: created directory '%s'", file_list[i]);
 	}
 	
 	return 0;
