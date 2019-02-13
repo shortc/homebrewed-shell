@@ -5,7 +5,12 @@
 #include<unistd.h>
 #include<sys/stat.h>
 #include<sys/types.h>
-#include<unistd.h>
+#include <pwd.h>
+#include <grp.h>
+#include <time.h>
+
+//#include<stat.h>
+//#include<types.h>
 
 char const * s_perm(mode_t mode) {
     static char local_buff[16] = {0};
@@ -59,7 +64,7 @@ void reverse_array(struct dirent **arr, int start, int end){
 
 int main(int argc, char** argv){
 
-    int *arrForArgs[8] = {0};
+    int arrForArgs[8] = {0};
     int file_counter = 0;
 
     char* dirname;
@@ -80,7 +85,7 @@ int main(int argc, char** argv){
 
         int option_index = 0;
 
-        sarg = getopt_long(argc, argv, "adlrRSt:", full_arg, &option_index);
+        sarg = getopt_long(argc, argv, "adlrRSt", full_arg, &option_index);
 
         if (sarg == -1) {
             break;
@@ -135,7 +140,7 @@ int main(int argc, char** argv){
 
             case 'g':
                 arrForArgs[7] = 1;
-                puts ("option -g\n");
+                puts ("option --groups\n");
                 break;
 
             case '?':
@@ -156,7 +161,7 @@ int main(int argc, char** argv){
 
     /* Print any remaining command line arguments (not options). */
     if (optind < argc) {
-        printf ("non-option ARGV-elements: ");
+        printf ("non-accepted option: ");
         while (optind < argc)
             printf ("%s ", argv[optind++]);
         putchar ('\n');
@@ -171,32 +176,66 @@ int main(int argc, char** argv){
     current_dir = opendir(dirname);
 
     struct dirent *current_file;
+    int counter = 0;
+
+    while((current_file = readdir(current_dir)) != NULL){
+        file_counter++;
+    }
+
+    struct dirent *entries[file_counter];
+
 
     rewinddir(current_dir);
-    struct dirent *entries[file_counter];
-    int counter = 0;
-    while(counter < file_counter){
-        current_file = readdir(current_dir);
-        entries[counter] = current_file;
-        counter++;
-    }
 
     if (arrForArgs[0] == 1){ // -a
-        struct dirent *current_file;
         while ((current_file = readdir(current_dir)) != NULL){
-            printf("%s  \n", current_file->d_name);
+            //printf("%s\n", current_file->d_name);
+            entries[counter] = current_file;
+            counter++;
         }
     } else {
-        struct dirent *current_file;
         while ((current_file = readdir(current_dir)) != NULL){
-            printf("%s  \n", current_file->d_name);
+            if(current_file->d_name[0] != '.'){
+                //printf("%s\n", current_file->d_name);
+                entries[counter] = current_file;
+                counter++;
+            }
         }
     }
 
+    // rewinddir(current_dir);
+    // struct dirent *entries[file_counter];
+    // int counter = 0;
+    // while(counter < file_counter){
+    //     current_file = readdir(current_dir);
+    //     entries[counter] = current_file;
+    //     counter++;
+    // }
+
     if (arrForArgs[2] == 1) { // -l
-
+        for(int i = 0; i < counter; i++){
+            struct stat statbuf;
+            char timebuf[15];
+            if (stat(entries[i]->d_name, &statbuf) == -1){
+                printf("error\n");
+                continue;
+            }
+            strftime(timebuf, 14, "%b %d %H:%M", localtime(&statbuf.st_mtime));
+            //printf("%-10.10s  %-1d %-6s %-1s %-1d %-10s %-1s\n", s_perm(statbuf.st_mode), statbuf.st_nlink, getpwuid(statbuf.st_uid)->pw_name, getgrgid(statbuf.st_gid)->gr_name, statbuf.st_size, timebuf, entries[i]->d_name);
+            //printf("%-10.10s  %-1d %-6s %-1s %d %-10s %-1s\n", s_perm(statbuf.st_mode), statbuf.st_nlink, getpwuid(statbuf.st_uid)->pw_name, getgrgid(statbuf.st_gid)->gr_name, statbuf.st_size, timebuf, entries[i]->d_name);
+            printf("%-10.10s ",  s_perm(statbuf.st_mode));
+            printf("%-1d "      statbuf.st_nlink);
+            printf("%-6s ",      getpwuid(statbuf.st_uid)->pw_name);
+            printf("%-1s ",      getgrgid(statbuf.st_gid)->gr_name);
+            printf("%-1d ",      statbuf.st_size);
+            printf("%*s ", 12,    timebuf);
+            printf("%-1s\n",    entries[i]->d_name);
+            // printf("%-10.10s\n", s_perm (statbuf.st_mode));
+            //printf("%-10s\n", getgrgid(statbuf.st_gid)->gr_name);
+            // printf("%-10s\n", entries[i]->d_name);
+        }
     } else if (arrForArgs[3] == 1) { // -r
-
+        reverse_array(entries, 0, counter - 1);
     } else if (arrForArgs[5] == 1) { // -S
 
     } else if (arrForArgs[6] == 1) { // -t
@@ -205,6 +244,10 @@ int main(int argc, char** argv){
 
     } else if (arrForArgs[4] == 1) { // -R
 
+    }
+
+    for (int x = 0; x < counter; x++) {
+        //printf("%s\n", entries[x]->d_name);
     }
 	return 0;
 }
