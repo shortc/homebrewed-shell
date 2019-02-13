@@ -3,7 +3,11 @@
 #include<unistd.h>
 #include<getopt.h>
 #include<sys/stat.h>
+#include<dirent.h>
 #include<sys/types.h>
+#include <pwd.h>
+#include <grp.h>
+#include <time.h>
 	
 
 int main(int argc, char** argv)
