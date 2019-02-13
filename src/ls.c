@@ -201,7 +201,7 @@ int main(int argc, char** argv){
     printf("%d",arrForArgs[6]);
     printf("%d\n",arrForArgs[7]);
 
-    char inputDir[2];
+    char inputDir[200];
     int inputCount = 0;
 
     /* Print any remaining command line arguments (not options). */
@@ -216,11 +216,14 @@ int main(int argc, char** argv){
             //current_dir = opendir(inputDir);
             //printf("%s", inputDir);
         }
+        printf("%s\n", inputDir);
+        printf("%d\n", inputCount);
         current_dir = opendir(inputDir);
 
-        putchar ('\n');
+        //putchar ('\n');
     } else {
         dirname = getenv("PWD");
+        printf("%s\n", dirname);
         current_dir = opendir(dirname);
     }
 
