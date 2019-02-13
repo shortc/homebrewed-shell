@@ -13,8 +13,7 @@
 int main(int argc, char** argv)
 {
 	
-	static int verbose_flag = 0;                                 //argument flags
-	static int parent_flag = 0;		
+	int command_flag[2];                                 //argument flag	
         int no_of_files = 0;
         int sarg;
 
@@ -31,7 +30,7 @@ int main(int argc, char** argv)
 			{NULL, 0, NULL, 0}
 		};
 
-		sarg = getopt_long(argc, argv, "p:v", full_arg, &parent_flag, &verbose_flag);
+		sarg = getopt_long(argc, argv, "p:v", full_arg, &command_flag);
 
 		if (sarg == -1)                                    //if there are no/no more arguments 
 		{
@@ -43,18 +42,18 @@ int main(int argc, char** argv)
 			case 0:
 				break;                             
             		case 'p':                                  //-p --parent
-            			parent_flag = 1;
+            			command_flag[0] = 1;
                 		puts ("option -p\n");
                 		break;
             		case 'v':                                  //-v --verbose
-                		verbose_flag = 1;
+                		verbose_flag[1] = 1;
                 		puts ("option -v\n");
                 		break;	
 		}
 	}
 	/*Tell me if we used either argument*/
-	printf("%d",parent_flag);
-	printf("%d",verbose_flag);
+	printf("%d",command_flag[0]);
+	printf("%d",command_flag[1]);
 	
 	   
          /*This will be used to read out the file names*/
@@ -104,12 +103,12 @@ int main(int argc, char** argv)
         printf("%s\n", file_list[i]);
 /*NEW STUFF*/
 	
-	if (parent_flag == 1)
+	if (command_flag[0] == 1)
 	{
 		print("We used the parent argument")
 	}
 	
-	if (verbose_flag == 1)
+	if (command_flag[1] == 1)
 	{
 		print("We used the verbose argument")
 			
