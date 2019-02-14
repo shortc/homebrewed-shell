@@ -98,7 +98,7 @@ int main(int argc, char** argv)
     {
         static struct option full_arg[] =              //building a struct to house all of the written out command args
         {
-            {"parent", 0, 0, 'p'},
+            {"parents", 0, 0, 'p'},
             {"verbose", 0, 0, 'v'},
             {NULL, 0, NULL, 0}
         };
