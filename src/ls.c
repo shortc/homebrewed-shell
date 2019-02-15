@@ -11,8 +11,6 @@
 #include<string.h>
 #include<errno.h>
 
-//#include<stat.h>
-//#include<types.h>
 
 char const * s_perm(mode_t mode) {
     static char local_buff[16] = {0};
@@ -53,6 +51,7 @@ char const * s_perm(mode_t mode) {
     return local_buff;
 }
 
+
 int reverse_array(struct dirent **arr, int start, int end){
     struct dirent *temp;
     if (start >= end){
@@ -64,6 +63,7 @@ int reverse_array(struct dirent **arr, int start, int end){
     reverse_array(arr, start+1, end-1);
     return 0;
 }
+
 
 int insertionSortSize(struct dirent **entries, int n, char *inputDir){
     int i, j;
@@ -107,6 +107,7 @@ int insertionSortSize(struct dirent **entries, int n, char *inputDir){
     return 0;
 }
 
+
 int insertionSortTime(struct dirent **entries, int n, char *inputDir){
     int i, j;
     struct dirent *key;
@@ -149,22 +150,17 @@ int insertionSortTime(struct dirent **entries, int n, char *inputDir){
     return 0;
 }
 
-int insertionSortAlpha(struct dirent **entries, int n){
-    int i, j;
-    struct dirent *key;
-    for (i = 1; i < n; i++) {
-        key = entries[i];
-        j = i - 1;
-
-        /* Move elements of arr[0..i-1], that are
-        greater than key, to one position ahead
-        of their current position */
-        while (j >= 0 && entries[j]->d_name[0] > key->d_name[0]) {
-            entries[j + 1] = entries[j];
-            j = j - 1;
+int sortAlpha(struct dirent **entries, int n){
+    struct dirent *temp;
+    for (int i = 0; i < n ; i++){
+        for (int j = i + 1; j < n; j++){
+            if (strcmp(entries[i]->d_name, entries[j]->d_name) > 0){
+                temp = entries[i];
+                entries[i] = entries[j];
+                entries[j] = temp;
+            }
         }
-        entries[j + 1] = key;
-     }
+    }
      return 0;
    }
 
@@ -196,6 +192,35 @@ int groupDirsFirst(struct dirent **entries, int n){
     return 0;
 }
 
+
+int listLong(struct dirent **entries, int counter, char *inputDir) {
+    for(int i = 0; i < counter; i++){
+        struct stat statbuf;
+        char timebuf[15];
+        char fullPath[500] = "";
+        if(inputDir[0] != 0){
+            strcat(fullPath, inputDir);
+            strcat(fullPath, "/");
+        }
+        strcat(fullPath, entries[i]->d_name);
+        if (stat(fullPath, &statbuf) == -1){
+            printf("errno %d\n", errno);
+            printf("Error in stat\n");
+            continue;
+        }
+        strftime(timebuf, 14, "%b %d %H:%M", localtime(&statbuf.st_mtime));
+        printf("%-10.10s ", s_perm(statbuf.st_mode));
+        printf("%3ld ", statbuf.st_nlink);
+        printf("%-6s ", getpwuid(statbuf.st_uid)->pw_name);
+        printf("%-1s ", getgrgid(statbuf.st_gid)->gr_name);
+        printf("%*ld ", 10, statbuf.st_size);
+        printf("%s ", timebuf);
+        printf("%-1s\n", entries[i]->d_name);
+    }
+    return 0;
+}
+
+
 int ls(int *arrForArgs, DIR *current_dir, char *inputDir){
     int file_counter = 0;
 
@@ -224,7 +249,7 @@ int ls(int *arrForArgs, DIR *current_dir, char *inputDir){
             entries[counter] = current_file;
             counter++;
         }
-        insertionSortAlpha(entries, counter);
+        sortAlpha(entries, counter);
     } else {
         while ((current_file = readdir(current_dir)) != NULL){
             if(current_file->d_name[0] != '.'){
@@ -232,7 +257,7 @@ int ls(int *arrForArgs, DIR *current_dir, char *inputDir){
                 counter++;
             }
         }
-        insertionSortAlpha(entries, counter);
+        sortAlpha(entries, counter);
     }
 
     if (arrForArgs[5] == 1) { // -S
@@ -249,39 +274,39 @@ int ls(int *arrForArgs, DIR *current_dir, char *inputDir){
     if (arrForArgs[7] == 1) { // --group-directories-first
         groupDirsFirst(entries, counter);
     }
-    if (arrForArgs[2] == 1) { // -l
-        for(int i = 0; i < counter; i++){
-            struct stat statbuf;
-            char timebuf[15];
-            char fullPath[500] = "";
-            if(inputDir[0] != 0){
-                strcat(fullPath, inputDir);
-                strcat(fullPath, "/");
-            }
-            strcat(fullPath, entries[i]->d_name);
-            if (stat(fullPath, &statbuf) == -1){
-                printf("errno %d\n", errno);
-                printf("Error in stat\n");
-                continue;
-            }
-            strftime(timebuf, 14, "%b %d %H:%M", localtime(&statbuf.st_mtime));
-            printf("%-10.10s ", s_perm(statbuf.st_mode));
-            printf("%3ld ", statbuf.st_nlink);
-            printf("%-6s ", getpwuid(statbuf.st_uid)->pw_name);
-            printf("%-1s ", getgrgid(statbuf.st_gid)->gr_name);
-            printf("%*ld ", 10, statbuf.st_size);
-            printf("%s ", timebuf);
-            printf("%-1s\n", entries[i]->d_name);
-        }
+    if (arrForArgs[2] == 1 && arrForArgs[4] != 1) { // -l
+        listLong(entries, counter, inputDir);
         return 0;
     }
+
     if (arrForArgs[4] == 1) { // -R
-        //ls()
+        printf("%s:\n", inputDir);
+        for (int x = 0; x < counter; x++) {
+            if (arrForArgs[2] == 1) { // -l
+                listLong(entries, counter, inputDir);
+            } else {
+                printf("%s\n", entries[x]->d_name);
+            }
+        }
+        printf("\n");
+        for (int x = 0; x < counter; x++) {
+            if (entries[x]->d_type == DT_DIR && strcmp(entries[x]->d_name, ".") != 0 && strcmp(entries[x]->d_name, "..") != 0) {
+                char recInputDir[500] = {0};
+                DIR *rec_Current_dir = {NULL};
+                strcat(recInputDir, inputDir);
+                strcat(recInputDir, "/");
+                strcat(recInputDir, entries[x]->d_name);
+                rec_Current_dir = opendir(recInputDir);
+                ls(arrForArgs, rec_Current_dir, recInputDir);
+            }
+        }
+    }
+    else {
+        for (int x = 0; x < counter; x++) {
+            printf("%s\n", entries[x]->d_name);
+        }
     }
 
-    for (int x = 0; x < counter; x++) {
-        printf("%s\n", entries[x]->d_name);
-    }
     return 0;
 }
 
@@ -363,19 +388,17 @@ int main(int argc, char** argv){
                 break;
 
             case '?':
+                return 0;
                 break;
 
         }
     }
-
-
 
     char inputDir[200] = {0};
     int inputCount = 0;
 
     /* Print any remaining command line arguments (not options). */
     if (optind < argc) {
-
         while (optind < argc) {
             char inputDir[200] = {0};
             strcat(inputDir, argv[optind++]);
@@ -384,9 +407,6 @@ int main(int argc, char** argv){
             current_dir = opendir(inputDir);
             ls(arrForArgs, current_dir, inputDir);
         }
-
-    //printf("%d\n",inputCount);
-
         current_dir = opendir(inputDir);
 
     } else {
@@ -394,8 +414,6 @@ int main(int argc, char** argv){
         current_dir = opendir(dirname);
         ls(arrForArgs, current_dir, inputDir);
     }
-
-    //ls(arrForArgs, current_dir, inputDir);
 
 	return 0;
 }
