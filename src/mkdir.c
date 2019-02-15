@@ -10,6 +10,41 @@
 #include<time.h>
 #include<string.h>
 
+/*No options chosen*/
+int orphan(int argc, char** argv)
+{
+  if (optind < argc)
+      while (optind < argc)  //while there are files to parse
+      {
+          if (argv[optind] == "/")
+          {
+              printf("mkdir: cannot create directory ‘/’: File exists");   //error message due to forward slash
+          }
+          else
+          {
+              mkdir(argv[optind], S_IRWXU | S_IRWXG | S_IRWXO);    //make the directory
+              optind++;   //move to the next file
+          }
+    }
+    return 0;
+}
+
+
+/*verbose option chosen*/
+int loud(int argc, char** argv)
+{
+    if (optind < argc)
+    while (optind < argc)  //while there are files to parse
+    {
+      mkdir(argv[optind], S_IRWXU | S_IRWXG | S_IRWXO);   //make the directory
+      printf("mkdir: created directory '%s' \n", argv[optind]);  //announce we made the directory
+      optind++;     //move onto the next file
+    }
+  return 0;
+}
+
+
+
 int parent(int argc, char**argv, char* dirname)
 {
         int j = 0;
@@ -26,21 +61,21 @@ int parent(int argc, char**argv, char* dirname)
         }
         char* OG_dir = dirname;
         char slash[] = "/";
-        DIR *current_dir; 
+        DIR *current_dir;
 
         while (j < i)
           {
             if(&array[j] == NULL)
             {
             printf("mkdir: cannot create directory ‘/’: File exists");
-            }             
+            }
             else
             {
                 mkdir(array[j], S_IRWXU | S_IRWXG | S_IRWXO);
                 strcat(dirname, slash);
                 strcat(dirname, array[j]);
-                chdir(dirname); 
-  
+                chdir(dirname);
+
                 current_dir = opendir(dirname);                   //going one directory down in theory
                 j++;
              }
@@ -48,41 +83,44 @@ int parent(int argc, char**argv, char* dirname)
      return 0;
 }
 
-
-
-int orphan(int argc, char** argv)
+int duo(int argc, char**argv, char* dirname)
 {
-  if (optind < argc)
-      while (optind < argc)
-      {
-          if (argv[optind] == "/")
-          { 
-              printf("mkdir: cannot create directory ‘/’: File exists");
-          }
-          else
+        int j = 0;
+        int i = 0;
+        char str[256];
+        strcpy(str, argv[optind]);
+        char *file_ptr = strtok(str, "/");
+        char *array[5];
+
+        while (file_ptr != NULL)
+        {
+            array[i++] = file_ptr;
+            file_ptr = strtok (NULL, "/");
+        }
+        char* OG_dir = dirname;
+        char slash[] = "/";
+        DIR *current_dir;
+
+        while (j < i)
           {
-              mkdir(argv[optind], S_IRWXU | S_IRWXG | S_IRWXO);
-              optind++;
-          }
-    }
-    return 0;
+            if(&array[j] == NULL)
+            {
+            printf("mkdir: cannot create directory ‘/’: File exists");
+            }
+            else
+            {
+                mkdir(array[j], S_IRWXU | S_IRWXG | S_IRWXO);
+                printf("mkdir: created directory '%s' \n", array[j]);
+                strcat(dirname, slash);
+                strcat(dirname, array[j]);
+                chdir(dirname);
+
+                current_dir = opendir(dirname);                   //going one directory down in theory
+                j++;
+             }
+           }
+     return 0;
 }
-
-
-
-int loud(int argc, char** argv)
-{
-    if (optind < argc)
-    while (optind < argc)
-    {
-      mkdir(argv[optind], S_IRWXU | S_IRWXG | S_IRWXO);
-      printf("mkdir: created directory '%s' \n", argv[optind]);
-      optind++;
-    }
-  return 0;
-}
-
-
 
 int main(int argc, char** argv)
 {
@@ -145,6 +183,11 @@ int main(int argc, char** argv)
     if (command_flag[0] == 0 && command_flag[1] == 1)
     {
        loud(argc,  argv);
+    }
+
+    if (command_flag[0] == 1 && command_flag[1] == 1)
+    {
+       duo(argc, argv, dirname);
     }
 
     return 0;
