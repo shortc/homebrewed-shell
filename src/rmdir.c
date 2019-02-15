@@ -93,8 +93,7 @@ int parent(int argc, char**argv, char* dirname)
                  while((current_file = readdir(current_dir)) != NULL)
                  {
                    count++;
-                 }
-               
+		 }
                  if (count <= 2)
                  {
                    rmdir(dirname);
@@ -108,8 +107,7 @@ int parent(int argc, char**argv, char* dirname)
                  chdir(OG_dir);
                  current_dir = opendir(OG_dir);
          i--;       
-      }  
-         
+      }   
      return 0;
 }    
 
@@ -119,7 +117,6 @@ int main(int argc, char** argv)
     int command_flag[1]= {0};                                   //argument flag
     int command_index = 0;
     int sarg;
-
 
     char* dirname = getenv("PWD");                         //find the directories pathname
     DIR *current_dir = opendir(dirname);                   //opening our current directory (this will be our default)
