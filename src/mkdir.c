@@ -50,33 +50,32 @@ int parent(int argc, char**argv, char* dirname)
         int j = 0;
         int i = 0;
         char str[256];
-        strcpy(str, argv[optind]);
-        char *file_ptr = strtok(str, "/");
-        char *array[5];
+        strcpy(str, argv[optind]);             //copy over argument value
+        char *file_ptr = strtok(str, "/");      //split on /
+        char *array[5];   
 
-        while (file_ptr != NULL)
+        while (file_ptr != NULL)     //while there are items to split on
         {
-            array[i++] = file_ptr;
-            file_ptr = strtok (NULL, "/");
+            array[i++] = file_ptr;    //add them to the array
+            file_ptr = strtok (NULL, "/");     //remove the /
         }
-        char* OG_dir = dirname;
         char slash[] = "/";
         DIR *current_dir;
 
         while (j < i)
           {
-            if(&array[j] == NULL)
+            if(&array[j] == NULL)    //if we have a file name
             {
-            printf("mkdir: cannot create directory ‘/’: File exists");
+            printf("mkdir: cannot create directory ‘/’: File exists");  //error message
             }
             else
             {
-                mkdir(array[j], S_IRWXU | S_IRWXG | S_IRWXO);
+                mkdir(array[j], S_IRWXU | S_IRWXG | S_IRWXO);      //make the directory
                 strcat(dirname, slash);
-                strcat(dirname, array[j]);
-                chdir(dirname);
+                strcat(dirname, array[j]);    //update the file path
+                chdir(dirname);    //move down the directory hierarchy
 
-                current_dir = opendir(dirname);                   //going one directory down in theory
+                current_dir = opendir(dirname);            //open up the new directory to parse
                 j++;
              }
            }
@@ -88,16 +87,15 @@ int duo(int argc, char**argv, char* dirname)
         int j = 0;
         int i = 0;
         char str[256];
-        strcpy(str, argv[optind]);
-        char *file_ptr = strtok(str, "/");
+        strcpy(str, argv[optind]);         //copy over argument value
+        char *file_ptr = strtok(str, "/");      //split on /
         char *array[5];
 
         while (file_ptr != NULL)
         {
-            array[i++] = file_ptr;
+            array[i++] = file_ptr;        //copy to array
             file_ptr = strtok (NULL, "/");
         }
-        char* OG_dir = dirname;
         char slash[] = "/";
         DIR *current_dir;
 
@@ -105,17 +103,17 @@ int duo(int argc, char**argv, char* dirname)
           {
             if(&array[j] == NULL)
             {
-            printf("mkdir: cannot create directory ‘/’: File exists");
+            printf("mkdir: cannot create directory ‘/’: File exists");     //print error message
             }
             else
             {
-                mkdir(array[j], S_IRWXU | S_IRWXG | S_IRWXO);
-                printf("mkdir: created directory '%s' \n", array[j]);
+                mkdir(array[j], S_IRWXU | S_IRWXG | S_IRWXO);    //create the directory
+                printf("mkdir: created directory '%s' \n", array[j]);      //announce the new directory was made
                 strcat(dirname, slash);
-                strcat(dirname, array[j]);
-                chdir(dirname);
+                strcat(dirname, array[j]);      //update the file path
+                chdir(dirname);                  //move down the directory
 
-                current_dir = opendir(dirname);                   //going one directory down in theory
+                current_dir = opendir(dirname);                       //open up the new directory to parse
                 j++;
              }
            }
