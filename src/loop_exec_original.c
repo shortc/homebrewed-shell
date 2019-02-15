@@ -1,6 +1,6 @@
 #include <unistd.h> //fork, execv
 #include <stdio.h> //printf, scanf
-#include <wait.h> //waitpid
+#include <sys/wait.h> //waitpid
 #include <string.h> //strncmp
 #include <stdarg.h> //arg parse
 #include <errno.h> //perror, errno
