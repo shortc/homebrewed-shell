@@ -11,6 +11,8 @@
 
 int main(int argc, char* argv[])
 {
+
+	char* PATH = "../src";
     //This example builds on fork_exec.c by repeating that
     //program's functionality in an infinite loop and adding
     //user interaction.
@@ -59,9 +61,10 @@ int main(int argc, char* argv[])
         //or "buffer overrun" vulnarabilities. Applying a bound to
         //the length of the potential comparison prevents this
         //issue.
-        printf("%s\n", cmd);
+        //printf("%s\n", cmd);
         if (strncmp("exit", cmd, 256) == 0)
         {
+			remove("env_vars");
             return 0;
         }
         if (strncmp("PATH", cmd, 256) == 0)
@@ -102,16 +105,55 @@ int main(int argc, char* argv[])
 			}
 			new_args[i] = arg_ptr;
 
-			//free(cmd);
+			char *env_vars[128];
+			char *line = NULL;
+			size_t len = 0;
+			ssize_t read;
+			FILE *env_vars_file;
+			
+			char* PWD = NULL;
+			i = 0;
+			if((env_vars_file = fopen("env_vars", "r")) != NULL){
+				while ((read = getline(&line, &len, env_vars_file)) != -1) {
+					env_vars[i] = (char *)malloc(sizeof(char) * read);
+					int line_len = strlen(line);
+					if(line_len > 0 && line[line_len - 1] == '\n'){
+						line[line_len - 1] = '\0';
+					}
+					strcpy(env_vars[i], line);
+					if(line_len >= 5 && strstr(line, "PATH=") != NULL){
+						PATH = (char *)malloc(sizeof(char) * (read - 5));
+						strcpy(PATH, line + 5);
+						//printf("NEW PATH IS: %s\n", PATH);
+					}
+					if(line_len >= 4 && strstr(line, "PWD=") != NULL){
+						PWD = (char *)malloc(sizeof(char) * (read - 4));
+						strcpy(PWD, line + 4);
+						//printf("NEW PWD IS: %s\n", PWD);
+					}
+					i++;
+				}
+			}
+			if(PWD == NULL){
+				char *parent_PWD = getenv("PWD");
+				env_vars[i] = (char *)malloc(sizeof(char) * (strlen(parent_PWD)));
+				strcpy(env_vars[i], "PWD=");
+				strcat(env_vars[i], parent_PWD);
+				i++;
+			}
 
+			env_vars[i] = NULL;
+			fclose(env_vars_file);
             //start of new code segment
 
-            //printf("%\n", new_args[0]);
 
             //if (execv(cmd, new_args) < 0)
-			//char* com_to_run = strcat("../src/", new_args[0]);
-			//printf("WHAT: %s\n", new_args[0]);
-            if (execv(cmd, new_args) < 0)
+			char com_to_run[256];
+			strcpy(com_to_run, PATH);
+			strcat(com_to_run, "/");
+			strcat(com_to_run, new_args[0]);
+			//printf("RUNNING: %s\n", com_to_run);
+            if (execve(com_to_run, new_args, env_vars) < 0)
 			{
             //If we are here, it is bevause execv failed. Switch on errno
             //using constants defined in errno.h to provide user-friendly
@@ -130,6 +172,8 @@ int main(int argc, char* argv[])
             }
             return -1;
         }
+		free(cmd);
+		free(env_vars);
     }
     else
     {
@@ -143,4 +187,5 @@ int main(int argc, char* argv[])
         //printf("Child terminated.\n");
     }
   }
+
 }
