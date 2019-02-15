@@ -16,7 +16,14 @@ int main(int argc, char* argv[])
     //user interaction.
     while (1)
     {
-        char cmd[256];
+        //char cmd[256];
+		
+		char *cmd = malloc(256);
+		if (cmd == NULL) {
+			printf("No memory\n");
+			return -1;
+		}
+
         char msg[100];
         //char *cmd;
         char envvars[100];
@@ -32,8 +39,13 @@ int main(int argc, char* argv[])
         printf("[%s@%s]$ ", getpwuid(uid)->pw_name, hostname);
     	//printf("%s@%s:%s$ ", getpwuid(uid)->pw_name, hostname, getenv("PWD"));
         //printf("$ ");
-        scanf("%s", cmd);
-        //fgets(cmd, 256, stdin);
+        
+		//scanf("%s", cmd);
+        fgets(cmd, 256, stdin);
+		if ((strlen(cmd) > 0) && (cmd[strlen (cmd) - 1] == '\n')){
+			cmd[strlen (cmd) - 1] = '\0';
+		}
+
         //getline(&cmd, &bufsize, stdin);
 
         //Break the loop and terminate if the user types "exit"
@@ -75,14 +87,32 @@ int main(int argc, char* argv[])
             //Note that this example does not parse the user input for
             //arguments and add them to the argument vector. Your shell
             //will have to do that.
-            char *new_args[] = {cmd     /* argv[0] */,
-                              NULL    /* NULL terminates the argument list */};
+			
+
+            //char *new_args[] = {cmd     /* argv[0] */,
+            //                  NULL    /* NULL terminates the argument list */};
+			
+			char *new_args[128];
+			int i = 0;
+			char *arg_ptr = strtok(cmd, " ");
+			while(arg_ptr != NULL){
+				new_args[i] = arg_ptr;
+				i++;
+				arg_ptr = strtok(NULL, " ");
+			}
+			new_args[i] = arg_ptr;
+
+			//free(cmd);
+
             //start of new code segment
 
             //printf("%\n", new_args[0]);
 
+            //if (execv(cmd, new_args) < 0)
+			//char* com_to_run = strcat("../src/", new_args[0]);
+			//printf("WHAT: %s\n", new_args[0]);
             if (execv(cmd, new_args) < 0)
-            {
+			{
             //If we are here, it is bevause execv failed. Switch on errno
             //using constants defined in errno.h to provide user-friendly
             //feedback.
