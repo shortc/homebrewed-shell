@@ -13,18 +13,28 @@
 int orphan(int argc, char** argv)
 {
   if (optind < argc)
+  {
       while (optind < argc)
       {
-          if (argv[optind] == "/")
+        
+          if (*argv[optind] ==  47)
           { 
-              printf("mkdir: cannot create directory ‘/’: File exists");
+              printf("mkdir: cannot create directory ‘/’: File exists\n");
+              optind++;
           }
           else
           {
               mkdir(argv[optind], S_IRWXU | S_IRWXG | S_IRWXO);
               optind++;
           }
-    }
+      }
+  } 
+  else
+  {
+      printf("mkdir: missing operand\n");
+      printf("Try 'mkdir --help' for more information.\n");
+  }
+
     return 0;
 }
 
@@ -33,12 +43,30 @@ int orphan(int argc, char** argv)
 int loud(int argc, char** argv)
 {
     if (optind < argc)
-    while (optind < argc)
     {
-      mkdir(argv[optind], S_IRWXU | S_IRWXG | S_IRWXO);
-      printf("mkdir: created directory '%s' \n", argv[optind]);
-      optind++;
+        while (optind < argc)
+        {
+
+            if (*argv[optind] ==  47)
+            {
+                printf("mkdir: cannot create directory ‘/’: File exists\n");
+                optind++;
+            }
+
+            else
+            {
+                mkdir(argv[optind], S_IRWXU | S_IRWXG | S_IRWXO);
+                printf("mkdir: created directory '%s' \n", argv[optind]);
+                optind++;
+            }
+        }
     }
+    else
+    {
+        printf("mkdir: missing operand\n");
+        printf("Try 'mkdir --help' for more information.\n");
+    }
+    
   return 0;
 }
 
@@ -46,68 +74,81 @@ int loud(int argc, char** argv)
 
 int parent(int argc, char**argv, char* dirname)
 {
-        int j = 0;
-        int i = 0;
-        char str[256];
-        strcpy(str, argv[optind]);
-        char *file_ptr = strtok(str, "/");
-        char *array[5];
+    if (optind < argc)
+    {
 
-        while (file_ptr != NULL)
+        if(*argv[optind] == 47)
         {
-            array[i++] = file_ptr;
-            file_ptr = strtok (NULL, "/");
+            printf("mkdir: cannot create directory ‘/’: File exists\n");
         }
-        char* OG_dir = dirname;
-        char slash[] = "/";
-        DIR *current_dir;
+        else
+        {
+            int j = 0;
+            int i = 0;
+            char str[256];
+            strcpy(str, argv[optind]);
+            char *file_ptr = strtok(str, "/");
+            char *array[5];
 
-        while (j < i)
-          {
-            if(&array[j] == NULL)
+            while (file_ptr != NULL)
             {
-            printf("mkdir: cannot create directory ‘/’: File exists");
+                array[i++] = file_ptr;
+                file_ptr = strtok (NULL, "/");
             }
-            else
+            char* OG_dir = dirname;
+            char slash[] = "/";
+            DIR *current_dir;
+
+            while (j < i)
             {
+  
                 mkdir(array[j], S_IRWXU | S_IRWXG | S_IRWXO);
                 strcat(dirname, slash);
                 strcat(dirname, array[j]);
                 chdir(dirname);
 
-                current_dir = opendir(dirname);                   //going one directory down in theory
+                current_dir = opendir(dirname);            //going one directory down in theory
                 j++;
-             }
-           }
-     return 0;
+            }
+        }
+    }
+
+    else
+    {
+        printf("mkdir: missing operand\n");
+        printf("Try 'mkdir --help' for more information.\n");
+    }
+    return 0;
 }
 
 
 int duo(int argc, char**argv, char* dirname)
-{
-        int j = 0;
-        int i = 0;
-        char str[256];
-        strcpy(str, argv[optind]);
-        char *file_ptr = strtok(str, "/");
-        char *array[5];
-
-        while (file_ptr != NULL)
+{ 
+    if (optind < argc)
+    {
+        if(*argv[optind] == 47)
         {
-            array[i++] = file_ptr;
-            file_ptr = strtok (NULL, "/");
+            printf("mkdir: cannot create directory ‘/’: File exists\n");
         }
-        char* OG_dir = dirname;
-        char slash[] = "/";
-        DIR *current_dir;
+        else
+        {
+            int j = 0;
+            int i = 0;
+            char str[256];
+            strcpy(str, argv[optind]);
+            char *file_ptr = strtok(str, "/");
+            char *array[5];
 
-        while (j < i)
-          {
-            if(&array[j] == NULL)
+            while (file_ptr != NULL)
             {
-            printf("mkdir: cannot create directory ‘/’: File exists");
+                array[i++] = file_ptr;
+                file_ptr = strtok (NULL, "/");
             }
-            else
+            char* OG_dir = dirname;
+            char slash[] = "/";
+            DIR *current_dir;
+
+            while (j < i)
             {
                 mkdir(array[j], S_IRWXU | S_IRWXG | S_IRWXO);
                 printf("mkdir: created directory '%s' \n", array[j]);
@@ -115,11 +156,18 @@ int duo(int argc, char**argv, char* dirname)
                 strcat(dirname, array[j]);
                 chdir(dirname);
 
-                current_dir = opendir(dirname);                   //going one directory down in theory
+                current_dir = opendir(dirname);           //going one directory down in theory
                 j++;
              }
-           }
-     return 0;
+        }
+      
+    }
+    else
+    {
+        printf("mkdir: missing operand\n");
+        printf("Try 'mkdir --help' for more information.\n");
+    }
+    return 0;
 }
 
 
@@ -150,7 +198,6 @@ int main(int argc, char** argv)
 	    switch (sarg)
 	    {
 		case 0:
-                    printf("mkdir: missing operand");
 		    break;
 
 		case 'p':                                  //-p --parent
