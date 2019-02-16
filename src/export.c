@@ -15,7 +15,7 @@ int export(char* assignment){
 		char *original = (char *)(malloc(sizeof(char) * strlen(assignment)));
 		strcpy(original, assignment);
 		char *left = strtok(assignment, "=");
-		char *left_copy = (char *)(malloc(sizeof(char) * strlen(left)));
+		char *left_copy = (char *)(malloc(sizeof(char) * (strlen(left) + 1)));
 		strcpy(left_copy, left);
 		strcat(left_copy, "=");
 
@@ -42,7 +42,7 @@ int export(char* assignment){
 
 int main(int argc, char** argv){
 	if(argc > 2 || argc == 1){
-		printf("usage: export assignment\n");
+		printf("usage: export [assignment]\n");
 		return 1;
 	}
 	export(argv[1]);

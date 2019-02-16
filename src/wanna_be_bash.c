@@ -12,15 +12,12 @@
 
 int main(int argc, char* argv[])
 {
-
 	char* PATH = "../bin:../src";
     //This example builds on fork_exec.c by repeating that
     //program's functionality in an infinite loop and adding
     //user interaction.
     while (1)
-    {
-        //char cmd[256];
-		
+    {	
 		char *cmd = malloc(256);
 		if (cmd == NULL) {
 			printf("No memory\n");
@@ -28,28 +25,18 @@ int main(int argc, char* argv[])
 		}
 
         char msg[100];
-        //char *cmd;
-        char envvars[100];
         char hostname[1024];
         gethostname(hostname, 1024);
-        //ssize_t bufsize = 0;
-
-        //printf("%s\n", cmd[0]);
-        //printf("%s\n", getenv("PATH"));
 
         //A simple prompt. I'm sure you'll be more creative.
         int uid = getuid();
         printf("[%s@%s]$ ", getpwuid(uid)->pw_name, hostname);
     	//printf("%s@%s:%s$ ", getpwuid(uid)->pw_name, hostname, getenv("PWD"));
         //printf("$ ");
-        
-		//scanf("%s", cmd);
         fgets(cmd, 256, stdin);
 		if ((strlen(cmd) > 0) && (cmd[strlen (cmd) - 1] == '\n')){
 			cmd[strlen (cmd) - 1] = '\0';
 		}
-
-        //getline(&cmd, &bufsize, stdin);
 
         //Break the loop and terminate if the user types "exit"
         //Note that the n in strncmp is significant. It puts
@@ -68,10 +55,6 @@ int main(int argc, char* argv[])
 			remove("env_vars");
             return 0;
         }
-        //if (strncmp("PATH", cmd, 256) == 0)
-        //{
-		//
-        //}
         if (strncmp("\n", cmd, 256) == 0)
         {
             continue;
@@ -80,9 +63,6 @@ int main(int argc, char* argv[])
 			remove("env_vars");
 			continue;
 		}
-
-        //PATH for MacOS
-        //putenv("PATH=/");
 
         //If we make it here, it means we have a command name other
         //than "exit" and should spawn a process. The rest of this
@@ -140,7 +120,11 @@ int main(int argc, char* argv[])
 			}
 			if(PWD == NULL){
 				char *parent_PWD = getenv("PWD");
-				env_vars[i] = (char *)malloc(sizeof(char) * (strlen(parent_PWD)));
+				env_vars[i] = (char *)malloc(sizeof(char) * ((strlen(parent_PWD) + 4)));
+				if (env_vars[i] == NULL) {
+					printf("No memory\n");
+					return -1;
+				}
 				strcpy(env_vars[i], "PWD=");
 				strcat(env_vars[i], parent_PWD);
 				i++;
@@ -148,14 +132,13 @@ int main(int argc, char* argv[])
 
 			env_vars[i] = NULL;
 			fclose(env_vars_file);
-            //start of new code segment
 			
 			char *check_p = (char *)malloc(sizeof(char) * strlen(PATH));
 			strcpy(check_p, PATH);
 			char *check_p_tok = strtok(check_p, ":");
 			char *check_com = NULL;
 			while(check_p_tok != NULL){
-				check_com = (char *)malloc(sizeof(char) * strlen(check_p_tok));
+				check_com = (char *)malloc(sizeof(char) * (strlen(check_p_tok) + strlen(new_args[0]) + 1) );
 				strcpy(check_com, check_p_tok);
 				strcat(check_com, "/");
 				strcat(check_com, new_args[0]);
@@ -167,6 +150,7 @@ int main(int argc, char* argv[])
 					free(check_com);
 				}
 			}
+
 			free(check_p);
             if (execve(check_com, new_args, env_vars) < 0)
 			{
@@ -179,6 +163,7 @@ int main(int argc, char* argv[])
                     printf("Error. No such file or directory.\n");
                     break;
                 case EPERM:
+					printf("Operation not permitted.\n");
                 case EACCES:
                     printf("Error. Permission denied.\n");
                     break;
