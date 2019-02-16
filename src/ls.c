@@ -305,6 +305,7 @@ int ls(int *arrForArgs, DIR *current_dir, char *inputDir){
         }
     }
     else {
+        int x;
         for (x = 0; x < counter; x++) {
             printf("%s\n", entries[x]->d_name);
         }
