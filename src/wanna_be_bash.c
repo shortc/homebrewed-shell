@@ -24,7 +24,6 @@ int main(int argc, char* argv[])
 			return -1;
 		}
 
-        char msg[100];
         char hostname[1024];
         gethostname(hostname, 1024);
 

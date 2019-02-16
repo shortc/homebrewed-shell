@@ -13,21 +13,18 @@
 /*Function to pare through a string to search for forward slashes*/
 int checkfortoken(char** argv)
 {
-     int i = 0;
      int count = 0;
      char tok[200];
      strcpy(tok, argv[optind]);                                     //spits the string
      char *file_ptr = strtok(tok, "/");
-     char *array[200];
 
      while (file_ptr != NULL)
      {
-         array[i++] = file_ptr;                                     //places tokenized characters into array
          file_ptr = strtok (NULL, "/");
          count ++;                                                  //counts # of times we go through a loop
      }
    //  printf("%d\n", count);
-     if (count == 0 | count > 1)                                    //if we have process any /, return a 1
+     if (count == 0 || count > 1)                                    //if we have process any /, return a 1
      {
         return 1;
      }
@@ -175,7 +172,6 @@ int parent(int argc, char**argv, char* dirname)
          int j = 0;
          int i = 0;
          char tok[256];
-         char*  temp;
          char tempdirname[256];
          strcpy(tok, argv[optind]);
          char *file_ptr = strtok(tok, "/");
@@ -256,7 +252,6 @@ int duo(int argc, char**argv, char* dirname)
          int j = 0;
          int i = 0;
          char tok[256];
-         char*  temp;
          char tempdirname[256];
          strcpy(tok, argv[optind]);
          char *file_ptr = strtok(tok, "/");                                     //divide input string on / token
@@ -340,8 +335,6 @@ int main(int argc, char** argv)
 
 
     char* dirname = getenv("PWD");                         //find the directories pathname
-    DIR *current_dir = opendir(dirname);                   //opening our current directory (this will be our default)
-    struct dirent *dir_to_list  = readdir(current_dir);    //next file in directory, will tell us if dir already exists?
 
     while (1)
     {

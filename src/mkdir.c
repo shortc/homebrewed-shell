@@ -14,17 +14,13 @@
  to parse each string and check for a forward slash*/
 int checkfortoken(char** argv)
 { 
-     int i = 0;
-
      int count = 0;
      char tok[200];
      strcpy(tok, argv[optind]);
      char *file_ptr = strtok(tok, "/");
-     char *array[200];
 
      while (file_ptr != NULL)
      {
-         array[i++] = file_ptr;
          file_ptr = strtok (NULL, "/");
          count ++;
      }
@@ -87,7 +83,7 @@ int orphan(int argc, char** argv, char* dirname, DIR *current_dir, struct dirent
               printf("mkdir: cannot create directory '%s': No such file or directory\n",argv[optind]);
           }
  
-          else if (strcmp(argv[optind], argv[optind-1]) == 0 | file_flag == 1)               //if we found a duplicate
+          else if (strcmp(argv[optind], argv[optind-1]) == 0 || file_flag == 1)               //if we found a duplicate
           { 
               printf("mkdir: cannot create directory '%s': File exists\n", argv[optind]);
           }
@@ -135,7 +131,7 @@ int loud(int argc, char** argv, char* dirname,DIR *current_dir, struct dirent *n
              printf("mkdir: cannot create directory '%s': No such file or directory\n",argv[optind]);
             }
 
-            else if (strcmp(argv[optind], argv[optind-1]) == 0 | file_flag == 1)             //if we found a duplicate
+            else if (strcmp(argv[optind], argv[optind-1]) == 0 || file_flag == 1)             //if we found a duplicate
             {
                 printf("mkdir: cannot create directory '%s': File exists\n", argv[optind]);
             }
@@ -191,9 +187,7 @@ int parent(int argc, char**argv, char* dirname, DIR *current_dir, struct dirent 
                 array[i++] = file_ptr;                                                       //put all directory names into a single array
                 file_ptr = strtok (NULL, "/");
             }
-            char* OG_dir = dirname;                                                          //combine the names to build a full file path
             char slash[] = "/";
-            DIR *current_dir;
 
             while (j < i)
             {
@@ -221,20 +215,17 @@ int parent(int argc, char**argv, char* dirname, DIR *current_dir, struct dirent 
 int duo(int argc, char**argv, char* dirname, DIR *current_dir, struct dirent *next_file)
 {
     int file_flag = 0; 
-    int silent_flag = 0;
     if (optind < argc)
     {
         file_flag = file_parse(argc, argv, dirname, current_dir, next_file);                 //checking for duplicates
 
         if(*argv[optind] == 47)                                                              //if our input starts with a /
         {
-            silent_flag = 1;
             printf("mkdir: cannot create directory ‘%s’: File exists\n", argv[optind]);
         }
 
         else if(file_flag == 1)                                                              //if we have found a duplicate
         {
-            silent_flag = 1;
             printf("mkdir: cannot create directory '%s': File exists\n", argv[optind]);
         }
         else
@@ -251,9 +242,7 @@ int duo(int argc, char**argv, char* dirname, DIR *current_dir, struct dirent *ne
                 array[i++] = file_ptr;                                                       //put all input into its own array
                 file_ptr = strtok (NULL, "/");
             }
-            char* OG_dir = dirname;                                                         //build a file path using the input name
             char slash[] = "/";
-            DIR *current_dir;
 
             while (j < i)
             {
