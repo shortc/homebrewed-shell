@@ -292,7 +292,7 @@ int ls(int *arrForArgs, DIR *current_dir, char *inputDir){
             }
         }
         printf("\n");
-        for (int x = 0; x < counter; x++) {
+        for (x = 0; x < counter; x++) {
             if (entries[x]->d_type == DT_DIR && strcmp(entries[x]->d_name, ".") != 0 && strcmp(entries[x]->d_name, "..") != 0) {
                 char recInputDir[500] = {0};
                 DIR *rec_Current_dir = {NULL};
@@ -305,7 +305,7 @@ int ls(int *arrForArgs, DIR *current_dir, char *inputDir){
         }
     }
     else {
-        for (int x = 0; x < counter; x++) {
+        for (x = 0; x < counter; x++) {
             printf("%s\n", entries[x]->d_name);
         }
     }
@@ -413,6 +413,7 @@ int main(int argc, char** argv){
         // Tests to see if file exists. If stat fails then file does not exist.
         struct stat statbuf;
         if (stat(inputDir, &statbuf) == -1){
+            errno = ENOENT;
             printf("errno %d\n", errno);
             //printf("Error in stat\n");
             return -1;
