@@ -88,7 +88,6 @@ int main(int argc, char* argv[])
 				arg_ptr = strtok(NULL, " ");
 			}
 			new_args[i] = arg_ptr;
-
 			char *env_vars[128];
 			char *line = NULL;
 			size_t len = 0;
@@ -131,8 +130,10 @@ int main(int argc, char* argv[])
 			}
 
 			env_vars[i] = NULL;
-			fclose(env_vars_file);
-			
+			if(env_vars_file != NULL){
+				fclose(env_vars_file);
+			}
+
 			char *check_p = (char *)malloc(sizeof(char) * strlen(PATH));
 			strcpy(check_p, PATH);
 			char *check_p_tok = strtok(check_p, ":");
@@ -150,8 +151,7 @@ int main(int argc, char* argv[])
 					free(check_com);
 				}
 			}
-
-			free(check_p);
+	    free(check_p);
             if (execve(check_com, new_args, env_vars) < 0)
 			{
             //If we are here, it is bevause execv failed. Switch on errno
