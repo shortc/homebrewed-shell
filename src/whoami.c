@@ -12,6 +12,10 @@ int whoami(){
 }
 
 int main(int argc, char** argv){
+	if(argc > 1){
+		printf("usage: whoami\n");
+		return 1;
+	}
 	whoami();
 	return 0;
 }
