@@ -406,21 +406,22 @@ int main(int argc, char** argv){
         while (optind < argc) {
             char inputDir[200] = {0};
             strcat(inputDir, argv[optind++]);
+
+            // Tests to see if file exists. If stat fails then file does not exist.
+            struct stat statbuf;
+            if (stat(inputDir, &statbuf) == -1){
+                errno = ENOENT;
+                //printf("errno %d\n", errno);
+                //printf("Error in stat\n");
+                perror("ls: cannot access file");
+                return -1;
+            }
+
             inputCount++;
             printf("%s:\n", inputDir);
             current_dir = opendir(inputDir);
             ls(arrForArgs, current_dir, inputDir);
         }
-        // Tests to see if file exists. If stat fails then file does not exist.
-        struct stat statbuf;
-        if (stat(inputDir, &statbuf) == -1){
-            errno = ENOENT;
-            printf("errno %d\n", errno);
-            //printf("Error in stat\n");
-            return -1;
-        }
-
-        current_dir = opendir(inputDir);
 
     } else {
         dirname = getenv("PWD");
