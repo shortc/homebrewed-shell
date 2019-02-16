@@ -174,7 +174,6 @@ int main(int argc, char* argv[])
         }
 		free(cmd);
 		free(check_com);
-		free(env_vars);
     }
     else
     {
