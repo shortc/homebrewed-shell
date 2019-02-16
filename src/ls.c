@@ -152,8 +152,9 @@ int insertionSortTime(struct dirent **entries, int n, char *inputDir){
 
 int sortAlpha(struct dirent **entries, int n){
     struct dirent *temp;
-    for (int i = 0; i < n ; i++){
-        for (int j = i + 1; j < n; j++){
+    int i, j;
+    for (i = 0; i < n ; i++){
+        for (j = i + 1; j < n; j++){
             if (strcmp(entries[i]->d_name, entries[j]->d_name) > 0){
                 temp = entries[i];
                 entries[i] = entries[j];
@@ -170,8 +171,8 @@ int groupDirsFirst(struct dirent **entries, int n){
     struct dirent *file_entries[n];
     int dir_count = 0;
     int file_count = 0;
-
-    for(int i = 0; i < n; i++){
+    int i, x, y, z;
+    for(i = 0; i < n; i++){
         if(entries[i]->d_type == DT_DIR){
             dir_entries[dir_count] = entries[i];
             dir_count++;
@@ -180,13 +181,13 @@ int groupDirsFirst(struct dirent **entries, int n){
             file_count++;
         }
     }
-    for(int x = 0; x < dir_count; x++){
+    for(x = 0; x < dir_count; x++){
         new_entries[x] = dir_entries[x];
     }
-    for(int y = 0; y < file_count; y++){
+    for(y = 0; y < file_count; y++){
         new_entries[y + dir_count] = file_entries[y];
     }
-    for(int z = 0; z < n; z++){
+    for(z = 0; z < n; z++){
         entries[z] = new_entries[z];
     }
     return 0;
@@ -194,7 +195,8 @@ int groupDirsFirst(struct dirent **entries, int n){
 
 
 int listLong(struct dirent **entries, int counter, char *inputDir) {
-    for(int i = 0; i < counter; i++){
+    int i;
+    for(i = 0; i < counter; i++){
         struct stat statbuf;
         char timebuf[15];
         char fullPath[500] = "";
@@ -281,7 +283,8 @@ int ls(int *arrForArgs, DIR *current_dir, char *inputDir){
 
     if (arrForArgs[4] == 1) { // -R
         printf("%s:\n", inputDir);
-        for (int x = 0; x < counter; x++) {
+        int x;
+        for (x = 0; x < counter; x++) {
             if (arrForArgs[2] == 1) { // -l
                 listLong(entries, counter, inputDir);
             } else {
@@ -397,7 +400,7 @@ int main(int argc, char** argv){
     char inputDir[200] = {0};
     int inputCount = 0;
 
-    /* Print any remaining command line arguments (not options). */
+    // If a directory was given then store it
     if (optind < argc) {
         while (optind < argc) {
             char inputDir[200] = {0};
@@ -407,6 +410,14 @@ int main(int argc, char** argv){
             current_dir = opendir(inputDir);
             ls(arrForArgs, current_dir, inputDir);
         }
+        // Tests to see if file exists. If stat fails then file does not exist.
+        struct stat statbuf;
+        if (stat(inputDir, &statbuf) == -1){
+            printf("errno %d\n", errno);
+            //printf("Error in stat\n");
+            return -1;
+        }
+
         current_dir = opendir(inputDir);
 
     } else {
