@@ -5,14 +5,15 @@
 #include <string.h> //strncmp
 #include <stdarg.h> //arg parse
 #include <errno.h> //perror, errno
-#include<pwd.h>
+#include <pwd.h>
 #include <unistd.h>
 #include <limits.h>
+#include <sys/stat.h>
 
 int main(int argc, char* argv[])
 {
 
-	char* PATH = "../src";
+	char* PATH = "../bin:../src";
     //This example builds on fork_exec.c by repeating that
     //program's functionality in an infinite loop and adding
     //user interaction.
@@ -67,15 +68,18 @@ int main(int argc, char* argv[])
 			remove("env_vars");
             return 0;
         }
-        if (strncmp("PATH", cmd, 256) == 0)
+        //if (strncmp("PATH", cmd, 256) == 0)
+        //{
+		//
+        //}
+        if (strncmp("\n", cmd, 256) == 0)
         {
-
-        }
-        if (strncmp("\n", msg, 256) == 0)
-        {
-            printf("$");
             continue;
         }
+		if (strncmp("reset", cmd, 256) == 0){
+			remove("env_vars");
+			continue;
+		}
 
         //PATH for MacOS
         //putenv("PATH=/");
@@ -145,15 +149,26 @@ int main(int argc, char* argv[])
 			env_vars[i] = NULL;
 			fclose(env_vars_file);
             //start of new code segment
-
-
-            //if (execv(cmd, new_args) < 0)
-			char com_to_run[256];
-			strcpy(com_to_run, PATH);
-			strcat(com_to_run, "/");
-			strcat(com_to_run, new_args[0]);
-			//printf("RUNNING: %s\n", com_to_run);
-            if (execve(com_to_run, new_args, env_vars) < 0)
+			
+			char *check_p = (char *)malloc(sizeof(char) * strlen(PATH));
+			strcpy(check_p, PATH);
+			char *check_p_tok = strtok(check_p, ":");
+			char *check_com = NULL;
+			while(check_p_tok != NULL){
+				check_com = (char *)malloc(sizeof(char) * strlen(check_p_tok));
+				strcpy(check_com, check_p_tok);
+				strcat(check_com, "/");
+				strcat(check_com, new_args[0]);
+				struct stat buffer;
+				if(stat(check_com, &buffer) == 0){
+					break;
+				} else {
+					check_p_tok = strtok(NULL, ":");
+					free(check_com);
+				}
+			}
+			free(check_p);
+            if (execve(check_com, new_args, env_vars) < 0)
 			{
             //If we are here, it is bevause execv failed. Switch on errno
             //using constants defined in errno.h to provide user-friendly
@@ -173,6 +188,7 @@ int main(int argc, char* argv[])
             return -1;
         }
 		free(cmd);
+		free(check_com);
 		free(env_vars);
     }
     else
